@@ -1,0 +1,83 @@
+model:
+  name: "dlmodels.models.VGGNet"
+  kwargs:
+    layer_num: [2, 2, 4, 4, 4]
+    num_classes: 100
+    batchnorm: false
+
+data:
+  train:
+    datasets:
+      - name: "torchvision.datasets.CIFAR100"
+        kwargs: 
+          root: "/home/sensetime/DL/data/cifar-100"
+          train: True
+        transforms:
+          base: "torchvision.transforms"
+          operations:
+            - name: "RandomRotation"
+              kwargs:
+                degrees: [0, 270]
+            - name: "RandomHorizontalFlip"
+              kwargs:
+                p: 0.5
+            - name: "RandomVerticalFlip"
+              kwargs:
+                p: 0.5
+            - name: "Resize"
+              kwargs:
+                size: [224, 224]
+            - name: "ToTensor"
+              kwargs: {}
+            - name: "Normalize"
+              kwargs:
+                mean: [0.4914, 0.4822, 0.4465]
+                std:  [0.247, 0.243, 0.261]
+    dataloader:
+      name: "torch.utils.data.DataLoader"
+      kwargs:
+        shuffle: True
+        batch_size: 64
+        num_workers: 2
+  val:
+    datasets:
+      - name: "torchvision.datasets.CIFAR100"
+        kwargs: 
+          root: "/home/sensetime/DL/data/cifar-100"
+          train: False
+        transforms:
+          base: "torchvision.transforms"
+          operations:
+            - name: "Resize"
+              kwargs: 
+                size: [224, 224]
+            - name: "ToTensor"
+              kwargs: {}
+            - name: "Normalize"
+              kwargs:
+                mean: [0.4914, 0.4822, 0.4465]
+                std:  [0.247, 0.243, 0.261]
+    dataloader:
+      name: "torch.utils.data.DataLoader"
+      kwargs:
+        shuffle: False
+        batch_size: 64
+        num_workers: 2
+
+train:
+  epochs: 250
+  optimizer:
+    name: "torch.optim.SGD"
+    kwargs:
+      lr: 0.001
+      momentum: 0.9
+  scheduler:
+    name: "torch.optim.lr_scheduler.StepLR"
+    kwargs:
+      step_size: 50
+      gamma: 0.1
+  criterion:
+    name: "torch.nn.CrossEntropyLoss"
+    kwargs: {}
+
+use_cuda: True

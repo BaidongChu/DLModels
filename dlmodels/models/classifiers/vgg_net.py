@@ -5,10 +5,10 @@ from ..backbones.vgg import VGG
 
 
 class VGGNet(nn.Module):
-    def __init__(self, configs, init_weights=True):
+    def __init__(self, init_weights=True, **kwargs):
         super().__init__()
 
-        self.backbone = VGG(configs['model']['layer_num'], configs['model']['batchnorm'])
+        self.backbone = VGG(kwargs['layer_num'], kwargs['batchnorm'])
         self.avgpool = nn.AdaptiveAvgPool2d((7, 7))
         self.classifier = nn.Sequential(
             nn.Flatten(1),
@@ -18,7 +18,7 @@ class VGGNet(nn.Module):
             nn.Linear(4096, 4096),
             nn.ReLU(True),
             nn.Dropout(0.5),
-            nn.Linear(4096, configs['model']['num_classes'])
+            nn.Linear(4096, kwargs['num_classes'])
         )
         if init_weights:
             self._initialize_weights()
