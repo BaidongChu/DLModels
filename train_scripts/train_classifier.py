@@ -12,7 +12,7 @@ from dlmodels.utils.config import Config
 def arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config_path", default="configs/vggnet/resnet_train.yaml")
-    parser.add_argument("--save_path", default="/home/sensetime/DL/train_folder/resnet")
+    parser.add_argument("--save_path", default="/mnt/HDD1/train_folder/resnet")
     return parser.parse_args()
 
 def save(save_path, epoch, model, best_metric, optimizer, scheduler):
@@ -66,6 +66,9 @@ def train(config):
         epoch_loss = 0
         epoch_correct = 0
 
+        for id, param_group in enumerate(optimizer.param_groups):
+            writer.add_scalar("lr/param_group%d"%id, param_group["lr"], epoch)
+
         for input, label in tqdm.tqdm(dataloaders["train_loader"]):
             if config.use_cuda():
                 input = input.cuda()
@@ -83,9 +86,6 @@ def train(config):
             epoch_correct += torch.sum(preds == label.data)
             writer.add_scalar("train/loss_step", loss.item(), step)
             step += 1
-        
-        for id, param_group in enumerate(optimizer.param_groups):
-            writer.add_scalar("lr/param_group%d"%id, param_group["lr"], epoch)
 
         scheduler.step()
         epoch_loss = epoch_loss / len(dataloaders["train_loader"].dataset)
@@ -114,13 +114,15 @@ def train(config):
 
         if epoch_acc > best_acc:
             best_acc = epoch_acc
-            save(os.path.join(args.save_path, "best.ckpt"), epoch, model, best_acc, optimizer, scheduler)
+            save(os.path.join(save_path, "best.ckpt"), epoch, model, best_acc, optimizer, scheduler)
 
         writer.add_scalar("valid/loss_epoch", epoch_loss, epoch)
         writer.add_scalar("valid/acc_epoch", epoch_acc.item(), epoch)
         
-        if epoch % 1 == 0:
-            save(os.path.join(args.save_path, "epoch_%d.ckpt"%epoch), epoch, model, best_acc, optimizer, scheduler)
+        if epoch % 10 == 0:
+            save(os.path.join(save_path, "epoch_%d.ckpt"%epoch), epoch, model, best_acc, optimizer, scheduler)
+        
+        epoch += 1
         
 
 if __name__ ==  "__main__":

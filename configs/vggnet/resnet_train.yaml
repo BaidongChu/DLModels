@@ -75,7 +75,7 @@ train:
   scheduler:
     name: "torch.optim.lr_scheduler.StepLR"
     kwargs:
-      step_size: 1
+      step_size: 40
       gamma: 0.1
   criterion:
     name: "torch.nn.CrossEntropyLoss"
@@ -85,4 +85,4 @@ use_cuda: True
 
 pretrain:
   model_path: ""
-  model_only: True
+  model_only: False
