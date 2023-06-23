@@ -62,3 +62,9 @@ class Config():
 
     def epochs(self):
         return self.configs["train"]["epochs"]
+
+    def get_pretrain_configs(self):
+        return {
+            "path": self.configs["pretrain"]["model_path"],
+            "model_only": self.configs["pretrain"]["model_only"]
+        }

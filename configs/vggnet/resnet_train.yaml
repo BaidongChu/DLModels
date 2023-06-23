@@ -1,9 +1,9 @@
 model:
-  name: "dlmodels.models.classifiers.vgg_net.VGGNet"
+  name: "dlmodels.models.classifiers.resnet.ResNet"
   kwargs:
-    layer_num: [2, 2, 4, 4, 4]
+    block_nums: [3, 4, 23, 3]
     num_classes: 100
-    batchnorm: false
+    use_bottleneck: True
 
 data:
   train:
@@ -37,7 +37,7 @@ data:
       name: "torch.utils.data.DataLoader"
       kwargs:
         shuffle: True
-        batch_size: 64
+        batch_size: 32
         num_workers: 2
   val:
     datasets:
@@ -65,12 +65,13 @@ data:
         num_workers: 2
 
 train:
-  epochs: 250
+  epochs: 200
   optimizer:
     name: "torch.optim.SGD"
     kwargs:
       lr: 0.001
       momentum: 0.9
+      weight_decay: 0.0001
   scheduler:
     name: "torch.optim.lr_scheduler.StepLR"
     kwargs:
@@ -81,3 +82,7 @@ train:
     kwargs: {}
 
 use_cuda: True
+
+pretrain:
+  model_path: ""
+  model_only: True
